@@ -14,14 +14,19 @@ void CLVaziaCidades(TListaCidade **CLista, int n){  //Cria lista(matriz) vazia d
 
 
 int PreencheLista(TListaCidade *CLista, float CapacidadeVeiculo){ //Preenche lista com numeros aleátorios de demanda;
-    int i,j;
+    int i,j,maior,aux1;
     for(i = 0; i < CLista->Tamanho; i++){
         for(j = 0; j < CLista->Tamanho; j++){
             if(i==j){ //refere-se a propria cidade, ou seja, onde vou armazenar os dados de cada cidade;
-                CLista->pCelula[i][j]->DistCid = 0;
-                CLista->pCelula[i][j]->pCidade->Cod_Cidade = i;
-                CLista->pCelula[i][j]->pCidade->Quant_Demanda = ((rand()%RAND_MAX_Demanda)+1)*1000;
-                CLista->Tot_Demanda = CLista->Tot_Demanda + CLista->pCelula[i][j]->pCidade->Quant_Demanda;
+                if (i == 0 && j == 0){
+                    CLista->pCelula[i][j]->DistCid = 0;
+                }
+                else {
+                    CLista->pCelula[i][j]->DistCid = 0;
+                    CLista->pCelula[i][j]->pCidade->Cod_Cidade = i;
+                    CLista->pCelula[i][j]->pCidade->Quant_Demanda = ((rand()%RAND_MAX_Demanda)+1)*1000;
+                    CLista->Tot_Demanda = CLista->Tot_Demanda + CLista->pCelula[i][j]->pCidade->Quant_Demanda;
+                }
             }
             else if(j>i){ //armazenar distâncias entre as cidades;
                 CLista->pCelula[i][j]->DistCid = (rand()%RAND_MAX_Distancia)+1;
@@ -30,6 +35,12 @@ int PreencheLista(TListaCidade *CLista, float CapacidadeVeiculo){ //Preenche lis
         }
     }
     CLista->quantVeiculos = CLista->Tot_Demanda/CapacidadeVeiculo;
+
+    aux1 = CLista->Tot_Demanda%CapacidadeVeiculo;// Atribui a variavel auxiliar o resto da demanda das cidades.
+    aux1 = aux1 / n;
+    for (i = 1; i < n; i++){
+        CLista->pCelula[i][i]->pCidade->Quant_Demanda = CLista->pCelula[i][i]->pCidade->Quant_Demanda - aux1;
+    }//Esse bloco diminui em cada cidade a demanda em excesso, tornando a demanda total multiplo da carga dos caminhoes.
 };
     int GeraRotas(TListaCidade *CLista){ //gerar possíveis rotas;
     /*
